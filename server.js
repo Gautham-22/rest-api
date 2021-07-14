@@ -1,4 +1,7 @@
-require("dotenv").config();           
+if(process.env.NODE_ENV !== "production") {   // value of NODE_ENV will be production when deployed to Heroku
+    require("dotenv").config();               // implies that we are using .env of local repo when not in production 
+}
+
 const express = require("express");
 const mongoose = require("mongoose");
 const router = require("./server/routes/router");
@@ -6,18 +9,10 @@ const router = require("./server/routes/router");
 const app = express();
 
 // Database connection
-mongoose.connect(process.env.DATABASE_URL,{     // DATABASE_URL will be populated to MongoDB Atlas cluster by heroku
-    useCreateIndex: true,
-    useNewUrlParser: true,
-    useFindAndModify: false
-})
-.then(() => {
-    console.log("Database connection successful");
-})
-.catch((err) => {
-    console.log(err);
-    process.exit(1);
-})
+mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true });  // DATABASE_URL will be set with mongoDB cluster in heroku
+const db = mongoose.connection;
+db.on('error', error => console.error(error));
+db.once('open', () => console.log('Connected to Mongoose'));
 
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
