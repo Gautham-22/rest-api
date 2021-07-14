@@ -10,7 +10,6 @@ const app = express();
 // Database connection
 mongoose.connect(process.env.DATABASE_URL,{    // DATABASE_URL will be populated to MongoDB Atlas cluster by heroku
     useNewUrlParser: true,
-    useUnifiedTopology: true,
     useFindAndModify: false
 })
 .then(() => {
