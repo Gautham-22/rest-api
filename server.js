@@ -4,19 +4,26 @@ if(process.env.NODE_ENV !== "production") {   // value of NODE_ENV will be produ
 
 const express = require("express");
 const mongoose = require("mongoose");
-const router = require("./server/routes/router");
-
 const app = express();
 
 // Database connection
-mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true });  // DATABASE_URL will be set with mongoDB cluster in heroku
-const db = mongoose.connection;
-db.on('error', error => console.error(error));
-db.once('open', () => console.log('Connected to Mongoose'));
+let router;
+mongoose.connect(process.env.DATABASE_URL, {
+    useNewUrlParser:true,
+    useFindAndModify:false
+})
+.then(() => {           // makes sure that models are loaded and used after connection
+    console.log("Connected to mongodb"); 
+    router = require("./server/routes/router");
+    app.use("/api/members",router);
+})
+.catch((err) => {
+    console.log(err.message);
+    process.exit(1);
+})
 
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
-app.use("/api/members",router);
 
 app.get("/",(req,res) => {
     res.send("<h1>REST API</h1>");            // can replaced with home page while creating frontend 
